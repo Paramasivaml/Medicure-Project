@@ -1,0 +1,30 @@
+- name: Deploy Application using Docker
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: latest
+
+    - name: Start and enable Docker service
+      service:
+        name: docker
+        enabled: yes
+        state: started
+
+    - name: Copy Dockerfile to server
+      copy:
+        src: Dockerfile
+        dest: /home/ubuntu/Dockerfile
+
+    - name: Copy JAR file to server
+      copy:
+        src: target
+        dest: /home/ubuntu
+
+    - name: Build Docker image
+      command: docker build -t sarus23/medicure-app:1.0 .
+
+    - name: Run Docker container
+      command: docker run -d -p 8084:8080 sarus23/medicure-app:1.0

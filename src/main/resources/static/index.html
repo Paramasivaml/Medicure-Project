@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Registration</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: url('pexels-pixabay-356040.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: white;
+        }
+
+        form {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 400px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px auto;
+            max-width: 400px;
+        }
+
+        li {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            color: white;
+        }
+        
+ 
+
+        .navigation {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .navigation a {
+            margin-left: 15px;
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="navigation">
+        <a href="services.html">Services</a>
+        <a href="about-us.html">About Us</a>
+        <a href="doctors.html">Doctors</a>
+        <a href="contact-us.html">Contact Us</a>
+    </div>
+     
+    <h1>Doctor Registration</h1>
+
+    <h2>Registered Doctors</h2>
+    <ul id="doctorList"></ul>
+    
+    <form id="doctorForm">
+     <label for="name">Doctor Name:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="regNo">Registration Number:</label>
+        <input type="text" id="regNo" name="regNo" required><br>
+
+        <label for="specialization">Specialization:</label>
+        <input type="text" id="specialization" name="specialization" required><br>
+     
+    <button type="submit">Register Doctor</button>
+    <p id="successMessage" style="color: green; display: none;">Doctor registered successfully</p>
+</form>
+
+    
+    <script>
+    const doctorForm = document.getElementById("doctorForm");
+    const doctorList = document.getElementById("doctorList");
+
+    doctorForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(doctorForm);
+        const data = {
+            name: formData.get("name"),
+            regNo: formData.get("regNo"),
+            specialization: formData.get("specialization")
+        };
+
+        try {
+            const response = await fetch("/api/doctors", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+
+            if (response.ok) {
+                const doctorItem = document.createElement("li");
+                doctorItem.textContent = `Name: ${result.name}, Reg No: ${result.regNo}, Specialization: ${result.specialization}`;
+                doctorList.appendChild(doctorItem);
+
+                doctorForm.reset();
+            } else {
+                alert("Failed to register doctor.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    });
+
+    async function loadDoctors() {
+        try {
+            const response = await fetch("/api/doctors");
+            const doctorsList = await response.json();
+
+            doctorList.innerHTML = ""; // Clear the previous list
+            doctorsList.forEach(doctor => {
+                const doctorItem = document.createElement("li");
+                doctorItem.textContent = `Name: ${doctor.name}, Reg No: ${doctor.regNo}, Specialization: ${doctor.specialization}`;
+                doctorList.appendChild(doctorItem);
+            });
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+
+    // Load doctors when the page loads
+    window.addEventListener("load", loadDoctors);
+</script>
+   
+</body>
+</html>
