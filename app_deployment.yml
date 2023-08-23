@@ -27,4 +27,4 @@
       command: docker build -t sarus23/medicure-app:1.0 .
 
     - name: Run Docker container
-      command: docker run -d -p 8084:8080 sarus23/medicure-app:1.0
+      command: docker run -d -p 8084:8084 sarus23/medicure-app:1.0
