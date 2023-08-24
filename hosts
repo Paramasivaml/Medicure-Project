@@ -1,2 +1,2 @@
 [selenium_test_server]
-{{ server_ip }}
+server_ip
