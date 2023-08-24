@@ -58,9 +58,4 @@
       file:
         path: chromedriver-linux64
         state: absent
-    - name: Copy JAR file
-      copy:
-        src: medicure.jar
-        dest: /home/ubuntu/medicure.jar
-    - name: run-java-file
-      command: sudo java -jar /home/ubuntu/medicure.jar
+    
