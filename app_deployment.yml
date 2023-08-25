@@ -5,7 +5,7 @@
   tasks:
     - name: Install Docker
       apt:
-        name: docker.io
+        name: docker
         state: latest
 
     - name: Start and enable Docker service
