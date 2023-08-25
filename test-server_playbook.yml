@@ -1,71 +1,61 @@
-- name: Configure Docker on EC2 Instances
-  hosts: all
-  become: true
-  connection: ssh
+---
+- name: Install OpenJDK 11 and ChromeDriver on Ubuntu AWS
+  hosts: your_ubuntu_instance
+  become: yes
   tasks:
     - name: Update APT cache
-      become: yes
       apt:
         update_cache: yes
+
     - name: Install openjdk-11-jdk package
-      become: yes
       apt:
         name: openjdk-11-jdk
         state: present
-    - name: install zip tool
-      become: yes
+
+    - name: Install unzip package
       apt:
-        name: zip
+        name: unzip
         state: present
+
     - name: Install Google Chrome repository signing key
       apt_key:
         url: https://dl.google.com/linux/linux_signing_key.pub
         state: present
+
     - name: Add Google Chrome APT repository
       apt_repository:
         repo: deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main
         state: present
+
     - name: Update APT cache after adding repository
       apt:
         update_cache: yes
+
     - name: Install Google Chrome package
       apt:
         name: google-chrome-stable
         state: present
-    - name: get google chrome zip
-      command: wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chrome-linux64.zip
-    - name: unzip Google Chrome
-      become: yes
-      shell: "unzip chrome-linux64.zip"
-    - name: Move Chrome to /opt
-      become: yes
-      command: "mv chrome-linux64 /opt/google-chrome"
-    - name: Create a symbolic link for Chrome
-      become: yes
-      file:
-        src: /opt/google-chrome/chrome
-        dest: /usr/local/bin/chrome
-        state: link
-    - name: get chromedriver zip
-      command: wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chromedriver-linux64.zip
-    - name: unzip chromedriver
-      become: yes
-      shell: "unzip chromedriver-linux64.zip"
+
+    - name: Download ChromeDriver zip
+      get_url:
+        url: https://chromedriver.storage.googleapis.com/LATEST_RELEASE
+        dest: /tmp/chromedriver_version
+
+    - name: Read ChromeDriver version from file
+      slurp:
+        src: /tmp/chromedriver_version
+      register: chromedriver_version
+
+    - name: Set ChromeDriver version variable
+      set_fact:
+        chromedriver_version: "{{ chromedriver_version['content'] | b64decode | string }}"
+
+    - name: Download ChromeDriver
+      unarchive:
+        src: "https://chromedriver.storage.googleapis.com/{{ chromedriver_version }}/chromedriver_linux64.zip"
+        dest: /tmp
+        remote_src: yes
+        creates: /tmp/chromedriver
+
     - name: Move ChromeDriver to /usr/local/bin
-      become: yes
-      command: "mv chromedriver /usr/local/bin/chromedriver"
-    - name: Change ownership of ChromeDriver to root
-      become: yes
-      file:
-        path: /usr/local/bin/chromedriver
-        owner: root
-        group: root
-        mode: '0755'
-    - name: Remove downloaded zip files
-      become: yes
-      file:
-        path: "{{ item }}"
-        state: absent
-      loop:
-        - chrome-linux64.zip
-        - chromedriver-linux64.zip
+      command: "mv /tmp/chromedriver /usr/local/bin/"
