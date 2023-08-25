@@ -1,6 +1,8 @@
+---
 - name: Configure Docker on EC2 Instances
   hosts: all
   become: true
+  connection: ssh
   tasks:
     - name: Update APT cache
       become: yes
@@ -11,7 +13,7 @@
       apt:
         name: openjdk-11-jdk
         state: present
-    - name: Install zip tool
+    - name: install zip tool
       become: yes
       apt:
         name: zip
@@ -27,64 +29,32 @@
     - name: Update APT cache after adding repository
       apt:
         update_cache: yes
-    - name: Remove Google Chrome
+    - name: Install Google Chrome package
       apt:
         name: google-chrome-stable
-        state: absent
-    - name: Remove ChromeDriver
+        state: present
+    - name: get google chrome driver
+      command: wget https://chromedriver.storage.googleapis.com/116.0.5845.36/chromedriver_linux64.zip
+    - name: install unzip tool
       become: yes
-      file:
-        path: /usr/bin/chromedriver
-        state: absent
-    - name: Download Google Chrome
-      get_url:
-        url: https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chrome-linux64.zip
-        dest: /tmp/chrome-linux64.zip
-    - name: Create destination directory for Google Chrome
+      apt:
+        name: unzip
+        state: present
+    - name: unzip chromedriver
       become: yes
-      file:
-        path: /tmp/chrome-linux64
-        state: directory
-    - name: Unzip Google Chrome
-      become: yes
-      unarchive:
-        src: /tmp/chrome-linux64.zip
-        dest: /tmp/chrome-linux64
-        remote_src: yes
-    - name: Move Google Chrome to /opt
-      become: yes
-      command: "mv /tmp/chrome-linux64 /opt/google-chrome"
-    - name: Create symlink for Google Chrome executable
-      become: yes
-      file:
-        src: /opt/google-chrome/chrome
-        dest: /usr/bin/google-chrome
-        state: link
-    - name: Download ChromeDriver
-      get_url:
-        url: https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chromedriver_linux64.zip
-        dest: /tmp/chromedriver-linux64.zip
-    - name: Unzip ChromeDriver
-      become: yes
-      unarchive:
-        src: /tmp/chromedriver-linux64.zip
-        dest: /tmp/chromedriver-linux64
-        remote_src: yes
+      shell: "unzip chromedriver_linux64.zip"
     - name: Move ChromeDriver to /usr/bin
       become: yes
-      command: "mv /tmp/chromedriver-linux64/chromedriver /usr/bin/chromedriver"
-    - name: Change ownership of ChromeDriver to root
+      command: "mv chromedriver /usr/bin/chromedriver"
+    - name: Change ownership to root
       become: yes
       file:
         path: /usr/bin/chromedriver
         owner: root
         group: root
         mode: '0755'
-    - name: Remove downloaded zip files
+    - name: Remove downloaded zip file
       become: yes
       file:
-        path: "{{ item }}"
+        path: chromedriver_linux64.zip
         state: absent
-      loop:
-        - /tmp/chrome-linux64.zip
-        - /tmp/chromedriver-linux64.zip
