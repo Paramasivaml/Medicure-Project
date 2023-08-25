@@ -7,7 +7,7 @@ resource "aws_instance" "test_server" {
   instance_type = "t2.micro"
   key_name      = "salini"
 
-  vpc_security_group_ids = ["sg-06d01af2b01353bb3"]  
+  vpc_security_group_ids = ["sg-0fca6397d8926fb5b"]  
 
   tags = {
     Name = "test-server"
