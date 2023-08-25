@@ -1,6 +1,6 @@
 ---
 - name: Install OpenJDK 11 and ChromeDriver on Ubuntu AWS
-  hosts: your_ubuntu_instance
+  hosts: all
   become: yes
   tasks:
     - name: Update APT cache
