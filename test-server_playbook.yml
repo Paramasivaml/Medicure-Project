@@ -37,6 +37,11 @@
       get_url:
         url: https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chrome-linux64.zip
         dest: /tmp/chrome-linux64.zip
+    - name: Create destination directory for Google Chrome
+      become: yes
+      file:
+        path: /tmp/chrome-linux64
+        state: directory
     - name: Unzip Google Chrome
       become: yes
       unarchive:
