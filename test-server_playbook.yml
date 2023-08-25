@@ -39,7 +39,7 @@
       shell: "unzip chrome-linux64.zip"
     - name: Move Chrome to /opt
       become: yes
-      command: "mv chrome-linux /opt/google-chrome"
+      command: "mv chrome-linux64 /opt/google-chrome"
     - name: Create a symbolic link for Chrome
       become: yes
       file:
