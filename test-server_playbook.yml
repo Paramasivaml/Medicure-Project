@@ -24,38 +24,59 @@
     - name: Update APT cache
       apt:
         update_cache: yes
-    - name: Install Google Chrome
+    - name: Remove Google Chrome
       apt:
         name: google-chrome-stable
-        state: present
-    - name: get google chrome driver
-      command: wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/115.0.5790.170/linux64/chromedriver-linux64.zip
-    - name: install zip tool
+        state: absent
+    - name: Remove ChromeDriver
       become: yes
-      apt:
-        name: zip
-        state: present
-    - name: unzip chromedriver
+      file:
+        path: /usr/bin/chromedriver
+        state: absent
+    - name: Download Google Chrome
+      get_url:
+        url: https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chrome-linux64.zip
+        dest: /tmp/chrome-linux64.zip
+    - name: Unzip Google Chrome
       become: yes
-      shell: "unzip chromedriver-linux64.zip"
+      unarchive:
+        src: /tmp/chrome-linux64.zip
+        dest: /tmp/chrome-linux64
+        remote_src: yes
+    - name: Move Google Chrome to /opt
+      become: yes
+      command: "mv /tmp/chrome-linux64 /opt/google-chrome"
+    - name: Create symlink for Google Chrome executable
+      become: yes
+      file:
+        src: /opt/google-chrome/chrome
+        dest: /usr/bin/google-chrome
+        state: link
+    - name: Download ChromeDriver
+      get_url:
+        url: https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chromedriver-linux64.zip
+        dest: /tmp/chromedriver-linux64.zip
+    - name: Unzip ChromeDriver
+      become: yes
+      unarchive:
+        src: /tmp/chromedriver-linux64.zip
+        dest: /tmp/chromedriver-linux64
+        remote_src: yes
     - name: Move ChromeDriver to /usr/bin
       become: yes
-      command: "mv chromedriver-linux64/chromedriver /usr/bin/chromedriver"
-    - name: Change ownership to root
+      command: "mv /tmp/chromedriver-linux64/chromedriver /usr/bin/chromedriver"
+    - name: Change ownership of ChromeDriver to root
       become: yes
       file:
         path: /usr/bin/chromedriver
         owner: root
         group: root
         mode: '0755'
-    - name: Remove downloaded zip file
+    - name: Remove downloaded zip files
       become: yes
       file:
-        path: chromedriver-linux64.zip
+        path: "{{ item }}"
         state: absent
-    - name: Remove temporary unzipped folder
-      become: yes
-      file:
-        path: chromedriver-linux64
-        state: absent
-    
+      loop:
+        - /tmp/chrome-linux64.zip
+        - /tmp/chromedriver-linux64.zip
