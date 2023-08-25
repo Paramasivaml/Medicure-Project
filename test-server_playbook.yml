@@ -1,6 +1,6 @@
 ---
-- name: Install OpenJDK 11 and ChromeDriver on Ubuntu AWS
-  hosts: all
+- name: Install OpenJDK 11, Chrome 116, and ChromeDriver 116 on Ubuntu AWS
+  hosts: your_ubuntu_instance
   become: yes
   tasks:
     - name: Update APT cache
@@ -31,29 +31,20 @@
       apt:
         update_cache: yes
 
-    - name: Install Google Chrome package
+    - name: Install Google Chrome package version 116
       apt:
-        name: google-chrome-stable
+        name: google-chrome-stable=116.0.0.0-1
         state: present
 
-    - name: Download ChromeDriver zip
+    - name: Download ChromeDriver version 116
       get_url:
-        url: https://chromedriver.storage.googleapis.com/LATEST_RELEASE
-        dest: /tmp/chromedriver_version
+        url: https://chromedriver.storage.googleapis.com/116.0.0.0/chromedriver_linux64.zip
+        dest: /tmp/chromedriver_linux64.zip
 
-    - name: Read ChromeDriver version from file
-      slurp:
-        src: /tmp/chromedriver_version
-      register: chromedriver_version
-
-    - name: Set ChromeDriver version variable
-      set_fact:
-        chromedriver_version: "{{ chromedriver_version['content'] | b64decode | string }}"
-
-    - name: Download ChromeDriver
+    - name: Unzip ChromeDriver
       unarchive:
-        src: "https://chromedriver.storage.googleapis.com/{{ chromedriver_version }}/chromedriver_linux64.zip"
-        dest: /tmp
+        src: /tmp/chromedriver_linux64.zip
+        dest: /tmp/
         remote_src: yes
         creates: /tmp/chromedriver
 
