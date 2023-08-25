@@ -1,5 +1,5 @@
 - name: Configure Test Server
-  hosts: test-server
+  hosts: all
   become: true
   tasks:
     - name: Download Google Chrome
