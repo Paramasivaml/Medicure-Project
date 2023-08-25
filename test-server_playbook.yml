@@ -8,80 +8,79 @@
       become: yes
       apt:
         update_cache: yes
+
     - name: Install openjdk-11-jdk package
       become: yes
       apt:
         name: openjdk-11-jdk
         state: present
+
+    - name: Install zip tool
+      become: yes
+      apt:
+        name: zip
+        state: present
+    
     - name: Install Google Chrome repository signing key
       apt_key:
         url: https://dl.google.com/linux/linux_signing_key.pub
         state: present
+
     - name: Add Google Chrome APT repository
       apt_repository:
         repo: deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main
         state: present
-    - name: Update APT cache
+
+    - name: Update APT cache after adding repository
       apt:
         update_cache: yes
+
     - name: Remove Google Chrome
       apt:
         name: google-chrome-stable
         state: absent
+
     - name: Remove ChromeDriver
       become: yes
       file:
         path: /usr/bin/chromedriver
         state: absent
+
     - name: Download Google Chrome
       get_url:
-        url: https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chrome-linux64.zip
-        dest: /tmp/chrome-linux64.zip
-    - name: Create destination directory for Google Chrome
-      become: yes
-      file:
-        path: /tmp/chrome-linux64
-        state: directory
-    - name: Unzip Google Chrome
-      become: yes
-      unarchive:
-        src: /tmp/chrome-linux64.zip
-        dest: /tmp/chrome-linux64
-        remote_src: yes
-    - name: Move Google Chrome to /opt
-      become: yes
-      command: "mv /tmp/chrome-linux64 /opt/google-chrome"
-    - name: Create symlink for Google Chrome executable
-      become: yes
-      file:
-        src: /opt/google-chrome/chrome
-        dest: /usr/bin/google-chrome
-        state: link
+        url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        dest: /tmp/google-chrome-stable.deb
+
+    - name: Install Google Chrome package
+      apt:
+        deb: /tmp/google-chrome-stable.deb
+        state: present
+
     - name: Download ChromeDriver
       get_url:
-        url: https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chromedriver-linux64.zip
+        url: https://chromedriver.storage.googleapis.com/116.0.5845.36/chromedriver_linux64.zip
         dest: /tmp/chromedriver-linux64.zip
+
     - name: Unzip ChromeDriver
       become: yes
       unarchive:
         src: /tmp/chromedriver-linux64.zip
-        dest: /tmp/chromedriver-linux64
+        dest: /usr/local/bin
         remote_src: yes
-    - name: Move ChromeDriver to /usr/bin
-      become: yes
-      command: "mv /tmp/chromedriver-linux64/chromedriver /usr/bin/chromedriver"
-    - name: Change ownership of ChromeDriver to root
+
+    - name: Change ownership and permissions of ChromeDriver
       become: yes
       file:
-        path: /usr/bin/chromedriver
+        path: /usr/local/bin/chromedriver
         owner: root
         group: root
         mode: '0755'
-    - name: Remove downloaded zip files
+
+    - name: Remove downloaded files
       become: yes
       file:
         path: "{{ item }}"
         state: absent
       loop:
-        - /tmp/chrome-linux64.zip
+        - /tmp/google-chrome-stable.deb
         - /tmp/chromedriver-linux64.zip
