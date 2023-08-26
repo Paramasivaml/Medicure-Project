@@ -42,17 +42,18 @@
     - name: Download ChromeDriver version 116
       get_url:
         url: https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chromedriver-linux64.zip
-        dest: /tmp/chromedriver_linux64.zip
+        dest: chromedriver_linux64.zip
 
     - name: Unzip ChromeDriver
       unarchive:
-        src: /tmp/chromedriver_linux64.zip
-        dest: /tmp/
+        src: chromedriver_linux64.zip
+        dest: /
         remote_src: yes
-        creates: /tmp/chromedriver
+        creates: chromedriver
 
     - name: Change permissions and move ChromeDriver to /usr/local/bin
       become: yes
       shell: |
-        chmod +x /tmp/chromedriver
-        mv /tmp/chromedriver /usr/local/bin/
+        cd ~/chromedriver-linux64/
+        chmod +x chromedriver
+        sudo mv chromedriver /usr/local/bin/
