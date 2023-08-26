@@ -41,7 +41,7 @@
 
     - name: Download ChromeDriver version 116
       get_url:
-        url: https://chromedriver.storage.googleapis.com/116.0.0.0/chromedriver_linux64.zip
+        url: https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chromedriver-linux64.zip
         dest: /tmp/chromedriver_linux64.zip
 
     - name: Unzip ChromeDriver
@@ -50,6 +50,7 @@
         dest: /tmp/
         remote_src: yes
         creates: /tmp/chromedriver
+
 
     - name: Move ChromeDriver to /usr/local/bin
       command: "mv /tmp/chromedriver /usr/local/bin/"
