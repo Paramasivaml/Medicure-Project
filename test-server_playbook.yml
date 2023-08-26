@@ -51,6 +51,8 @@
         remote_src: yes
         creates: /tmp/chromedriver
 
-
-    - name: Move ChromeDriver to /usr/local/bin
-      command: "mv /tmp/chromedriver /usr/local/bin/"
+    - name: Change permissions and move ChromeDriver to /usr/local/bin
+      become: yes
+      shell: |
+        chmod +x /tmp/chromedriver
+        mv /tmp/chromedriver /usr/local/bin/
