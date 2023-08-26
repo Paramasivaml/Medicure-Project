@@ -1,4 +1,3 @@
----
 - name: Install OpenJDK 11, Chrome 116, and ChromeDriver 116 on Ubuntu AWS
   hosts: all
   become: yes
@@ -31,10 +30,14 @@
       apt:
         update_cache: yes
 
-    - name: Install Google Chrome package version 116
-      apt:
-        name: google-chrome-stable=116.0.0.0-1
-        state: present
+    - name: get google chrome zip
+      command: wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chrome-linux64.zip
+      args:
+        chdir: /tmp
+
+    - name: unzip Google Chrome
+      become: yes
+      shell: "unzip -o /tmp/chrome-linux64.zip -d /opt"
 
     - name: Download ChromeDriver version 116
       get_url:
