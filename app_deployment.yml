@@ -1,3 +1,4 @@
+---
 - name: Deploy Application using Docker
   hosts: all
   become: yes
@@ -22,7 +23,10 @@
     - name: Copy JAR file to server
       copy:
         src: target
-        dest: /home/ubuntu
+      dest: /home/ubuntu/
 
     - name: Build Docker image
       command: docker build -t sarus23/medicure-app:1.0 .
+
+    - name: Run Docker container
+      command: docker run -d -p 8084:8084 sarus23/medicure-app:1.0
