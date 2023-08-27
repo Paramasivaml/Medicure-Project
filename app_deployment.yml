@@ -3,6 +3,17 @@
   become: yes
   become_user: root
   tasks:
+    - name: Add Docker repository
+      apt_repository:
+        repo: "deb [arch={{ dpkg_architecture_stdout }} signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ lsb_release_codename_stdout }} stable"
+        filename: docker.list
+        state: present
+        update_cache: yes
+      vars:
+        dpkg_architecture_stdout: "{{ lookup('pipe', 'dpkg --print-architecture') }}"
+        lsb_release_codename_stdout: "{{ lookup('pipe', 'lsb_release -cs') }}"
+      become: yes
+
     - name: Install Docker
       apt:
         name: docker.io
