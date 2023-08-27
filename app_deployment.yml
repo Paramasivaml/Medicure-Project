@@ -20,10 +20,13 @@
         src: Dockerfile
         dest: /home/ubuntu/Dockerfile
 
-    - name: Copy JAR file to server
+    - name: Copy entire target directory to server
       copy:
-        src: target
-      dest: /home/ubuntu/
+        src: target/
+        dest: /home/ubuntu/
+        remote_src: yes
+        force: yes
+        recurse: yes
 
     - name: Build Docker image
       command: docker build -t sarus23/medicure-app:1.0 .
