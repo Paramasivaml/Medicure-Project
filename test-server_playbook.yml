@@ -30,30 +30,28 @@
       apt:
         update_cache: yes
 
-    - name: get google chrome zip
-      command: wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chrome-linux64.zip
+    - name: Download ChromeDriver version 116
+      command: "sudo wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chromedriver-linux64.zip"
       args:
         chdir: /tmp
 
-    - name: unzip Google Chrome
-      become: yes
-      shell: "unzip -o /tmp/chrome-linux64.zip -d /opt"
-
-    - name: Download ChromeDriver version 116
-      get_url:
-        url: https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chromedriver-linux64.zip
-        dest: chromedriver_linux64.zip
-
     - name: Unzip ChromeDriver
-      unarchive:
-        src: chromedriver_linux64.zip
-        dest: /
-        remote_src: yes
-        creates: chromedriver
+      command: "unzip chromedriver-linux64.zip"
+      args:
+        chdir: /tmp
 
-    - name: Change permissions and move ChromeDriver to /usr/local/bin
-      become: yes
-      shell: |
-        cd ~/chromedriver-linux64/
-        chmod +x chromedriver
-        sudo mv chromedriver /usr/local/bin/
+    - name: Move ChromeDriver to /usr/local/bin/
+      command: "sudo mv /tmp/chromedriver-linux64/chromedriver /usr/local/bin/"
+      
+    - name: Download Chrome version 116
+      command: "sudo wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/116.0.5845.96/linux64/chrome-linux64.zip"
+      args:
+        chdir: /tmp
+
+    - name: Unzip Chrome
+      command: "unzip chrome-linux64.zip"
+      args:
+        chdir: /tmp
+
+    - name: Move Chrome to /usr/local/bin/
+      command: "sudo mv /tmp/chrome-linux64/chrome /usr/local/bin/"
