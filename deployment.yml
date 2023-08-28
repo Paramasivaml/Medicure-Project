@@ -15,3 +15,5 @@ spec:
       containers:
       - name: medicure-app
         image: sarus23/medicure-app:1.0
+        ports:
+      - containerPort: 8084
