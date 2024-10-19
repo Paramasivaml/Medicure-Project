@@ -1,0 +1,50 @@
+<form action="/vendors" method="POST">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    <br>
+    <label for="contact">Contact:</label>
+    <input type="text" id="contact" name="contact" required>
+    <br>
+    <label for="specialization">Specialization:</label>
+    <input type="text" id="specialization" name="specialization" required>
+    <br>
+    <button type="submit">Add Vendor</button>
+</form>
+// Add vendor route
+app.post('/vendors', (req, res) => {
+    const { name, contact, specialization } = req.body;
+
+    const sql = 'INSERT INTO vendors (name, contact, specialization) VALUES (?, ?, ?)';
+    pool.query(sql, [name, contact, specialization], (err, result) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error adding vendor');
+        } else {
+            res.redirect('/'); // Redirect to the main page
+        }
+    });
+});
+<ul>
+    <% vendors.forEach(vendor => { %>
+        <li>
+            <%= vendor.name %>
+            <a href="/vendors/<%= vendor.id %>/edit">Edit</a>
+            <a href="/vendors/<%= vendor.id %>/delete">Delete</a>
+        </li>
+    <% }) %>
+</ul>
+// Get vendors route
+app.get('/', (req, res) => {
+    const sql = 'SELECT * FROM vendors';
+    pool.query(sql, (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error fetching vendors');
+        } else {
+            res.render('index', { vendors: results });
+        }
+    });
+});
+
+// Edit vendor route
+// Delete vendor route
